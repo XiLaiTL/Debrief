@@ -8,7 +8,7 @@ using ItemStatsSystem;
 using Saves;
 using TMPro;
 
-namespace DisplayTotalReward
+namespace Debrief
 {
     [HarmonyPatch(typeof(MoneyDisplay), "OnEnable")]
     public class PatchMoneyDisplayOnEnable
@@ -97,7 +97,7 @@ namespace DisplayTotalReward
                     totalValue = (int)(ModBehaviour.PlayerTotalValue() - ModBehaviour.EnterLevelTotalValue);
                 }
 
-                totalRewardText.text = ModBehaviour.GetTotalRewardText(totalValue);
+                totalRewardText.text = TranslatableText.T(LanguageKey.TotalReward, totalValue);
             }
 
             Action<Item> onSetStackCount = item => {

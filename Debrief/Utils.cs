@@ -1,0 +1,45 @@
+﻿using Duckov.Utilities;
+using TMPro;
+using UnityEngine;
+
+namespace Debrief
+{
+    public class Utils
+    {
+        public static void PrintSceneHierarchy(GameObject current)
+        {
+            PrintTransformHierarchy(current.transform, "");
+        }
+
+        private static void PrintTransformHierarchy(Transform current, string prefix)
+        {
+            // 输出当前Transform
+            Debug.Log(prefix + current.name + " (Active: " + current.gameObject.activeInHierarchy + ")");
+        
+            // 更新前缀用于子对象
+            var newPrefix = prefix + "  ";
+        
+            // 递归处理所有子对象
+            for (int i = 0; i < current.childCount; i++)
+            {
+                PrintTransformHierarchy(current.GetChild(i), newPrefix);
+            }
+        }
+
+        /// <summary>
+        /// 创建文本组件的辅助方法
+        /// </summary>
+        public static TextMeshProUGUI CreateTextComponent(Transform parent, string name, Vector2 position, int fontSize, Color color)
+        {
+            var textComponent = Object.Instantiate(GameplayDataSettings.UIStyle.TemplateTextUGUI, parent);
+            textComponent.gameObject.name = name;
+            textComponent.fontSize = fontSize;
+            textComponent.color = color;
+            
+            var rt = textComponent.rectTransform;
+            rt.localPosition = position;
+            
+            return textComponent;
+        }
+    }
+}

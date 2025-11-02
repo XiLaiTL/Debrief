@@ -1,7 +1,7 @@
 using Duckov.UI;
 using HarmonyLib;
 
-namespace DisplayTotalReward
+namespace Debrief
 {
     [HarmonyPatch(typeof(MoneyDisplay), "OnDestroy")]
     public class PatchMoneyDisplayOnDestroy

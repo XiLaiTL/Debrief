@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DisplayTotalReward
+namespace Debrief
 {
     [HarmonyPatch(typeof(MoneyDisplay), "Awake")]
     public class PatchMoneyDisplayAwake
