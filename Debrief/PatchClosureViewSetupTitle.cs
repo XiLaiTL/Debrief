@@ -13,6 +13,7 @@ namespace Debrief
         
         public static void Prefix(ClosureView __instance, bool dead)
         {
+            // PatchClosureViewAwake.CreateView(__instance);
 
             var totalValue = (int)(ModBehaviour.PlayerTotalValue() - ModBehaviour.EnterLevelTotalValue);
             QuickStatsView.SetTotalRewardText(totalValue);

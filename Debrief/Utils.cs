@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Debrief
 {
-    public class Utils
+    public static class Utils
     {
         public static void PrintSceneHierarchy(GameObject current)
         {
@@ -50,6 +50,39 @@ namespace Debrief
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
         
+        public static T GetOrAddComponent<T>(this GameObject uo) where T : Component
+        {
+            var component = uo.GetComponent<T>();
+            if (component == null)
+            {
+                component = uo.AddComponent<T>();
+            }
+            return component;
+        }
+
+        
+        public static GameObject GetOrAddGameObject(this Transform transform, string name)
+        {
+            var node = transform.Find(name);
+            if (node == null)
+            {
+                node = new GameObject(name).transform;
+                node.SetParent(transform, false);
+            }
+            return node.gameObject;
+        }
+        
+        public static T GetOrInstantiate<T>(this Transform transform, string name, T prefab) where T : Component
+        {
+            var node = transform.Find(name);
+            if (node == null)
+            {
+                var obj = Object.Instantiate(prefab, transform);
+                obj.gameObject.name = name;
+                return obj;
+            }
+            return node.GetComponent<T>();
+        }
 
     }
 }

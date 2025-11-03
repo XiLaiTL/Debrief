@@ -56,10 +56,9 @@ namespace Debrief
         {
             if (Instance == null)
             {
-                var viewGO = new GameObject("QuickStatsView");
-                Instance = viewGO.AddComponent<QuickStatsView>();
+                var viewGO = LevelManager.Instance.transform.GetOrAddGameObject("QuickStatsView");
+                Instance = viewGO.GetOrAddComponent<QuickStatsView>();
                 Instance.Initialize();
-                viewGO.transform.SetParent(LevelManager.Instance.transform, false);
                 Debug.Log("QuickStatsView Created");
             }
         }
@@ -83,7 +82,17 @@ namespace Debrief
             AddQuestRecordContainer(backgroundRect);
         }
 
-        private void SetupComponents()
+        private void SetupComponentsInBase()
+        {
+            
+        }
+
+        private void SetupComponentsInOther()
+        {
+            
+        }
+
+        private void SetupComponentsTest()
         {
             var totalValue = (int)(ModBehaviour.PlayerTotalValue());
             SetTotalRewardText(totalValue);
@@ -135,6 +144,17 @@ namespace Debrief
 
             UpdateQuestRecords(questRecordTest);
         }
+        private void SetupComponents()
+        {
+            if (ModBehaviour.CurrentSceneName.Contains("Base") )
+            {
+                SetupComponentsInBase();
+            }
+            else
+            {
+                SetupComponentsInOther();
+            }
+        }
 
 
         /// <summary>
@@ -143,17 +163,16 @@ namespace Debrief
         private void Initialize()
         {
             // 创建Canvas
-            canvas = gameObject.AddComponent<Canvas>();
+            canvas = gameObject.GetOrAddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 1000; // 高优先级，确保显示在最前面
 
             // 添加Graphic Raycaster以支持UI交互
-            gameObject.AddComponent<GraphicRaycaster>();
+            gameObject.GetOrAddComponent<GraphicRaycaster>();
 
             // 创建背景
-            var backgroundGO = new GameObject("Background");
-            backgroundRect = backgroundGO.AddComponent<RectTransform>();
-            backgroundRect.SetParent(transform, false);
+            var backgroundGO = transform.GetOrAddGameObject("Background");
+            backgroundRect = backgroundGO.GetOrAddComponent<RectTransform>();
 
             // 设置背景位置和大小（屏幕中央）
             backgroundRect.anchorMin = Vector2.zero;
@@ -162,23 +181,28 @@ namespace Debrief
             backgroundRect.offsetMax = Vector2.zero;
 
             // 设置背景颜色
-            var backgroundImage = backgroundGO.AddComponent<Image>();
-            ColorUtility.TryParseHtmlString("#0D0D0DFF", out var backgroundColor);
+            var backgroundImage = backgroundGO.GetOrAddComponent<Image>();
+            ColorUtility.TryParseHtmlString("#0D0D0D40", out var backgroundColor);
             backgroundImage.color = backgroundColor;
 
             // 创建中间内容容器
-            var contentGO = new GameObject("Content");
-            contentRect = contentGO.AddComponent<RectTransform>();
-            contentRect.SetParent(backgroundRect, false);
+            var contentGO = transform.GetOrAddGameObject("Content");
+            contentRect = contentGO.GetOrAddComponent<RectTransform>();
 
             // 设置内容容器位置和大小：正中间，高度100%，宽度三分之一
-            contentRect.anchorMin = new Vector2(0.1f, 0f); // 左侧锚点：三分之一宽度
-            contentRect.anchorMax = new Vector2(0.9f, 1f); // 右侧锚点：三分之二宽度
+            contentRect.anchorMin = new Vector2(0.333f, 0f); // 左侧锚点：三分之一宽度
+            contentRect.anchorMax = new Vector2(0.667f, 1f); // 右侧锚点：三分之二宽度
             contentRect.offsetMin = Vector2.zero;
             contentRect.offsetMax = Vector2.zero;
+            
+            var contentImage = contentGO.GetOrAddComponent<Image>();
+            ColorUtility.TryParseHtmlString("#3D3D3D40", out var contentColor);
+            contentImage.color = contentColor;
+
+
 
             // 添加垂直布局组
-            var verticalLayout = contentGO.AddComponent<VerticalLayoutGroup>();
+            var verticalLayout = contentGO.GetOrAddComponent<VerticalLayoutGroup>();
             verticalLayout.spacing = 10;
             verticalLayout.childControlWidth = true;
             verticalLayout.childControlHeight = false;
@@ -188,14 +212,13 @@ namespace Debrief
             verticalLayout.padding = new RectOffset(20, 20, 20, 20);
 
             // 添加内容尺寸适配器
-            var contentFitter = contentGO.AddComponent<ContentSizeFitter>();
+            var contentFitter = contentGO.GetOrAddComponent<ContentSizeFitter>();
             contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 创建标题
-            var titleGO = new GameObject("Title");
-            var titleRect = titleGO.AddComponent<RectTransform>();
-            titleRect.SetParent(contentRect, false); // 将标题放在内容容器内
+            var titleGO = contentRect.GetOrAddGameObject("Title");
+            var titleRect = titleGO.GetOrAddComponent<RectTransform>();
 
             // 标题位置：在内容容器内顶部
             titleRect.anchorMin = new Vector2(0f, 1f);
@@ -204,15 +227,15 @@ namespace Debrief
             titleRect.anchoredPosition = new Vector2(0f, 0f);
             titleRect.sizeDelta = new Vector2(0f, 60f);
 
-            titleText = titleGO.AddComponent<TextMeshProUGUI>();
+            titleText = titleGO.GetOrAddComponent<TextMeshProUGUI>();
             titleText.text = "快速统计";
             titleText.alignment = TextAlignmentOptions.Center;
-            titleText.fontSize = 42;
+            titleText.fontSize = 56;
             titleText.color = Color.white;
             titleText.fontStyle = FontStyles.Bold;
 
             // 为标题添加布局元素
-            var titleLayoutElement = titleGO.AddComponent<LayoutElement>();
+            var titleLayoutElement = titleGO.GetOrAddComponent<LayoutElement>();
             titleLayoutElement.preferredHeight = 60;
             titleLayoutElement.flexibleHeight = 0;
 
@@ -251,20 +274,19 @@ namespace Debrief
             // 开启相机渲染
             ModBehaviour.ExtraCamera.Start();
 
-            var containerGO = new GameObject("ExtraCharacterRenderer");
-            var container = containerGO.AddComponent<RectTransform>();
-            // 设置父级和锚点
-            container.SetParent(transform);
+            var containerGO = transform.GetOrAddGameObject("ExtraCharacterRenderer");
+            var container = containerGO.GetOrAddComponent<RectTransform>();
+
             container.anchorMin = new Vector2(1f, 0.5f); // 左下锚点：右侧(1)，垂直中心(0.5)
             container.anchorMax = new Vector2(1f, 0.5f); // 右上锚点：右侧(1)，垂直中心(0.5)
 
             // 设置轴心点为右侧中心，这样旋转和缩放会以右侧为中心
             container.pivot = new Vector2(1f, 0.5f);
-            container.anchoredPosition = new Vector2(-100f,0);
+            container.anchoredPosition = new Vector2(-100f, -Screen.height / 4.0f);
 
             container.sizeDelta = new Vector2(512, 512);
 
-            var mapImage = containerGO.AddComponent<RawImage>();
+            var mapImage = containerGO.GetOrAddComponent<RawImage>();
             mapImage.texture = ModBehaviour.ExtraCamera.CharacterTexture;
         }
 
@@ -280,8 +302,7 @@ namespace Debrief
 
         public static void AddDurationTextComponent(Transform transform)
         {
-            durationText = Instantiate(GameplayDataSettings.UIStyle.TemplateTextUGUI, transform);
-            durationText.gameObject.name = "DurationText";
+            durationText = transform.GetOrInstantiate("DurationText", GameplayDataSettings.UIStyle.TemplateTextUGUI);
             durationText.enableAutoSizing = true;
             durationText.fontSizeMin = 25;
             durationText.fontSizeMax = 40;
@@ -342,18 +363,17 @@ namespace Debrief
             for (var row = 0; row < rows; row++)
             {
                 // 创建水平行容器
-                var rowGO = new GameObject($"ItemRow{row}");
-                var rowRect = rowGO.AddComponent<RectTransform>();
-                rowRect.SetParent(itemStackContainerRect, false);
+                var rowGO = itemStackContainerRect.GetOrAddGameObject($"ItemRow{row}");
+                var rowRect = rowGO.GetOrAddComponent<RectTransform>();
                 rowRect.sizeDelta = new Vector2(500, 125);
                 
                 // 设置布局元素
-                var rowLayoutElement = rowGO.AddComponent<LayoutElement>();
+                var rowLayoutElement = rowGO.GetOrAddComponent<LayoutElement>();
                 rowLayoutElement.preferredHeight = 125;
                 rowLayoutElement.flexibleHeight = 1;
 
                 // 设置行布局
-                var rowLayout = rowGO.AddComponent<HorizontalLayoutGroup>();
+                var rowLayout = rowGO.GetOrAddComponent<HorizontalLayoutGroup>();
                 rowLayout.childAlignment = TextAnchor.MiddleCenter;
                 rowLayout.childControlWidth = false;
                 rowLayout.childControlHeight = false;
@@ -372,19 +392,18 @@ namespace Debrief
 
                     Debug.Log($"Col {row}: {itemIndex} items: {itemStacks[itemIndex].DisplayName}");
                     
-                    var itemStackGO = new GameObject($"ItemStack{itemIndex}");
-                    var itemStackRect = itemStackGO.AddComponent<RectTransform>();
-                    itemStackRect.SetParent(rowRect, false);
+                    var itemStackGO = rowRect.GetOrAddGameObject($"ItemStack{itemIndex}");
+                    var itemStackRect = itemStackGO.GetOrAddComponent<RectTransform>();
                     itemStackRect.sizeDelta = new Vector2(90, 125);
 
                     // 设置布局元素
-                    var layoutElement = itemStackGO.AddComponent<LayoutElement>();
+                    var layoutElement = itemStackGO.GetOrAddComponent<LayoutElement>();
                     layoutElement.preferredWidth = 90;
                     layoutElement.preferredHeight = 125;
                     layoutElement.flexibleWidth = 0;
                     layoutElement.flexibleHeight = 1;
 
-                    var itemStackUI = itemStackGO.AddComponent<ItemStackUI>();
+                    var itemStackUI = itemStackGO.GetOrAddComponent<ItemStackUI>();
                     itemStackUI.SetItemStack(itemStacks[itemIndex]);
                     itemStackUIs[itemIndex] = itemStackUI;
                 }
@@ -397,22 +416,21 @@ namespace Debrief
         public static void AddTotalRewardContainer(Transform transform, float width)
         {
             
-            var totalRewardContainer = new GameObject("TotalRewardContainer");
-            totalRewardContainerRect = totalRewardContainer.AddComponent<RectTransform>();
-            totalRewardContainerRect.SetParent(transform);
+            var totalRewardContainer = transform.GetOrAddGameObject("TotalRewardContainer");
+            totalRewardContainerRect = totalRewardContainer.GetOrAddComponent<RectTransform>();
             totalRewardContainerRect.anchorMin = new Vector2(0.5f, 1f);
             totalRewardContainerRect.anchorMax = new Vector2(0.5f, 1f);
             totalRewardContainerRect.pivot = new Vector2(0.5f, 1f);
             totalRewardContainerRect.anchoredPosition = Vector2.zero;
             totalRewardContainerRect.sizeDelta = new Vector2(width, 100);
             
-            var containerLayoutElement = totalRewardContainer.AddComponent<LayoutElement>();
+            var containerLayoutElement = totalRewardContainer.GetOrAddComponent<LayoutElement>();
             containerLayoutElement.preferredHeight = 100;
             containerLayoutElement.flexibleWidth = 0;
             containerLayoutElement.preferredWidth = width;
 
             // 为totalRewardContainerRect添加垂直布局组
-            var verticalLayout = totalRewardContainer.AddComponent<VerticalLayoutGroup>();
+            var verticalLayout = totalRewardContainer.GetOrAddComponent<VerticalLayoutGroup>();
             verticalLayout.spacing = 10;
             verticalLayout.childControlWidth = true;
             verticalLayout.childControlHeight = false;
@@ -421,22 +439,21 @@ namespace Debrief
             verticalLayout.childAlignment = TextAnchor.UpperCenter;
 
             // 添加内容尺寸适配器
-            var contentFitter = totalRewardContainer.AddComponent<ContentSizeFitter>();
+            var contentFitter = totalRewardContainer.GetOrAddComponent<ContentSizeFitter>();
             contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 创建水平布局容器用于收益文本
-            var rewardTextContainer = new GameObject("RewardTextContainer");
-            var rewardTextContainerRect = rewardTextContainer.AddComponent<RectTransform>();
-            rewardTextContainerRect.SetParent(totalRewardContainerRect);
+            var rewardTextContainer = totalRewardContainerRect.GetOrAddGameObject("RewardTextContainer");
+            var rewardTextContainerRect = rewardTextContainer.GetOrAddComponent<RectTransform>();
 
             // 为水平容器添加布局元素
-            var rewardTextLayoutElement = rewardTextContainer.AddComponent<LayoutElement>();
+            var rewardTextLayoutElement = rewardTextContainer.GetOrAddComponent<LayoutElement>();
             rewardTextLayoutElement.preferredHeight = 50;
             rewardTextLayoutElement.flexibleHeight = 0;
 
             // 为水平容器添加水平布局组
-            var horizontalLayout = rewardTextContainer.AddComponent<HorizontalLayoutGroup>();
+            var horizontalLayout = rewardTextContainer.GetOrAddComponent<HorizontalLayoutGroup>();
             horizontalLayout.spacing = 10;
             horizontalLayout.childControlWidth = false;
             horizontalLayout.childControlHeight = true;
@@ -445,45 +462,39 @@ namespace Debrief
             horizontalLayout.childAlignment = TextAnchor.MiddleCenter;
 
             // 创建左侧文本（本地化文本）
-            var leftTextGO = new GameObject("TotalRewardLeftText");
-            var leftTextRect = leftTextGO.AddComponent<RectTransform>();
-            leftTextRect.SetParent(rewardTextContainerRect);
-
-            totalRewardText = leftTextGO.AddComponent<TextMeshProUGUI>();
-            totalRewardText.gameObject.name = "TotalRewardText";
+            totalRewardText = rewardTextContainerRect.GetOrInstantiate("TotalRewardLeftText",
+                GameplayDataSettings.UIStyle.TemplateTextUGUI);
             totalRewardText.enableAutoSizing = true;
             totalRewardText.fontSizeMin = 30;
             totalRewardText.fontSizeMax = 40;
             totalRewardText.alignment = TextAlignmentOptions.Right;
             totalRewardText.color = Color.white;
 
+            var leftTextGO = totalRewardText.gameObject;
+            
             // 为左侧文本添加布局元素
-            var leftTextLayout = leftTextGO.AddComponent<LayoutElement>();
+            var leftTextLayout = leftTextGO.GetOrAddComponent<LayoutElement>();
             leftTextLayout.preferredWidth = 200;
             leftTextLayout.flexibleWidth = 0;
 
             // 创建右侧文本（金额显示）
-            var rightTextGO = new GameObject("TotalRewardValueText");
-            var rightTextRect = rightTextGO.AddComponent<RectTransform>();
-            rightTextRect.SetParent(rewardTextContainerRect);
-
-            totalRewardValueText = rightTextGO.AddComponent<TextMeshProUGUI>();
-            totalRewardValueText.gameObject.name = "TotalRewardValueText";
+            totalRewardValueText = rewardTextContainerRect.GetOrInstantiate("TotalRewardValueText",
+                GameplayDataSettings.UIStyle.TemplateTextUGUI);;
             totalRewardValueText.enableAutoSizing = true;
             totalRewardValueText.fontSizeMin = 30;
             totalRewardValueText.fontSizeMax = 40;
             totalRewardValueText.alignment = TextAlignmentOptions.Left;
             totalRewardValueText.color = Color.white;
-
+            
+            var rightTextGO = totalRewardValueText.gameObject;
             // 为右侧文本添加布局元素
-            var rightTextLayout = rightTextGO.AddComponent<LayoutElement>();
+            var rightTextLayout = rightTextGO.GetOrAddComponent<LayoutElement>();
             rightTextLayout.preferredWidth = 150;
             rightTextLayout.flexibleWidth = 0;
 
             // 原有的itemStackContainerRect创建代码保持不变
-            var itemStackContainerGO = new GameObject("DebriefItemContainer");
-            itemStackContainerRect = itemStackContainerGO.AddComponent<RectTransform>();
-            itemStackContainerRect.SetParent(totalRewardContainerRect);
+            var itemStackContainerGO = totalRewardContainerRect.GetOrAddGameObject("DebriefItemContainer");
+            itemStackContainerRect = itemStackContainerGO.GetOrAddComponent<RectTransform>();
 
             // 设置容器布局
             itemStackContainerRect.anchorMin = new Vector2(0.5f, 1f);
@@ -495,28 +506,28 @@ namespace Debrief
             itemStackContainerRect.sizeDelta = new Vector2(width, 250); // 增加高度以容纳多行
             itemStackContainerRect.anchoredPosition = new Vector2(0, 0);
 
-            var backgroundImage = totalRewardContainer.AddComponent<Image>();
-            backgroundImage.sprite = SpriteUtils.BgWhite;
-            backgroundImage.preserveAspect = false;
-            ColorUtility.TryParseHtmlString("#373737FF", out var color);
-            backgroundImage.color = color;
+            // var backgroundImage = totalRewardContainer.GetOrAddComponent<Image>();
+            // backgroundImage.sprite = SpriteUtils.BgWhite;
+            // backgroundImage.preserveAspect = false;
+            // ColorUtility.TryParseHtmlString("#373737FF", out var color);
+            // backgroundImage.color = color;
             
             // 为itemStackContainerRect添加布局元素
-            var itemContainerLayoutElement = itemStackContainerGO.AddComponent<LayoutElement>();
+            var itemContainerLayoutElement = itemStackContainerGO.GetOrAddComponent<LayoutElement>();
             itemContainerLayoutElement.preferredHeight = 250;
             itemContainerLayoutElement.flexibleHeight = 1;
 
             // 添加滚动视图
-            var scrollRect = itemStackContainerGO.AddComponent<ScrollRect>();
+            var scrollRect = itemStackContainerGO.GetOrAddComponent<ScrollRect>();
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
 
             // 添加遮罩
-            var mask = itemStackContainerGO.AddComponent<Mask>();
+            var mask = itemStackContainerGO.GetOrAddComponent<Mask>();
             mask.showMaskGraphic = false;
 
             // 添加背景
-            var background = itemStackContainerGO.AddComponent<Image>();
+            var background = itemStackContainerGO.GetOrAddComponent<Image>();
             background.color = new Color(0f, 0f, 0f, 0.5f); // 半透明黑色
 
             // 将滚动视图的视口和内容设置正确
@@ -524,7 +535,7 @@ namespace Debrief
             scrollRect.content = itemStackContainerRect;
 
             // 为内容容器添加垂直布局组
-            var itemVerticalLayout = itemStackContainerGO.AddComponent<VerticalLayoutGroup>();
+            var itemVerticalLayout = itemStackContainerGO.GetOrAddComponent<VerticalLayoutGroup>();
             itemVerticalLayout.childAlignment = TextAnchor.UpperCenter; // 顶部居中对齐
             itemVerticalLayout.childControlWidth = false;
             itemVerticalLayout.childControlHeight = false;
@@ -533,7 +544,7 @@ namespace Debrief
             itemVerticalLayout.spacing = 0;
 
             // 添加内容尺寸适配
-            var itemContentFitter = itemStackContainerGO.AddComponent<ContentSizeFitter>();
+            var itemContentFitter = itemStackContainerGO.GetOrAddComponent<ContentSizeFitter>();
             itemContentFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             itemContentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
@@ -547,11 +558,10 @@ namespace Debrief
         /// </summary>
         public static void AddLeftContentContainer(Transform transform)
         {
-            var containerGO = new GameObject("LeftContent");
-            leftContentRect = containerGO.AddComponent<RectTransform>();
+            var containerGO = transform.GetOrAddGameObject("LeftContent");
+            leftContentRect = containerGO.GetOrAddComponent<RectTransform>();
 
             // 设置父级和锚点，使其固定在左侧并占满高度
-            leftContentRect.SetParent(transform);
             leftContentRect.anchorMin = new Vector2(0f, 0f); // 左下锚点：左侧(0)，底部(0)
             leftContentRect.anchorMax = new Vector2(0f, 1f); // 右上锚点：左侧(0)，顶部(1)
             leftContentRect.pivot = new Vector2(0f, 1f); // 轴心点：左上角
@@ -559,7 +569,7 @@ namespace Debrief
             leftContentRect.sizeDelta = new Vector2(480f, 0f); // 宽度480，高度自适应
 
             // 添加垂直布局组
-            var verticalLayout = containerGO.AddComponent<VerticalLayoutGroup>();
+            var verticalLayout = containerGO.GetOrAddComponent<VerticalLayoutGroup>();
             verticalLayout.spacing = 10;
             verticalLayout.childControlWidth = true;
             verticalLayout.childControlHeight = false;
@@ -568,7 +578,7 @@ namespace Debrief
             verticalLayout.childAlignment = TextAnchor.UpperLeft;
 
             // 添加内容尺寸适配器
-            var contentFitter = containerGO.AddComponent<ContentSizeFitter>();
+            var contentFitter = containerGO.GetOrAddComponent<ContentSizeFitter>();
             contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
@@ -604,11 +614,10 @@ namespace Debrief
             var index = 0;
             foreach (var killRecord in records.Values)
             {
-                var killRecordGO = new GameObject("KillRecord");
-                var killRecordRect = killRecordGO.AddComponent<RectTransform>();
-                killRecordRect.SetParent(killRecordContainerRect, false);
+                var killRecordGO = killRecordContainerRect.GetOrAddGameObject($"KillRecord{index}");
+                var killRecordRect = killRecordGO.GetOrAddComponent<RectTransform>();
                 killRecordRect.sizeDelta = new Vector2(480, 40); // 宽度略小于容器
-                var killRecordBackground = killRecordGO.AddComponent<Image>();
+                var killRecordBackground = killRecordGO.GetOrAddComponent<Image>();
                 // 检查是否为Boss角色图标，如果是则设置背景为淡红色
                 if (killRecord.VictimSprite == GameplayDataSettings.UIStyle.BossCharacterIcon)
                 {
@@ -621,13 +630,13 @@ namespace Debrief
                     killRecordBackground.color = Color.clear;
                 }
 
-                var layoutElement = killRecordGO.AddComponent<LayoutElement>();
+                var layoutElement = killRecordGO.GetOrAddComponent<LayoutElement>();
                 layoutElement.preferredWidth = 480;
                 layoutElement.preferredHeight = 50;
                 layoutElement.flexibleWidth = 0;
                 layoutElement.flexibleHeight = 1;
 
-                var killRecordUI = killRecordGO.AddComponent<KillRecordUI>();
+                var killRecordUI = killRecordGO.GetOrAddComponent<KillRecordUI>();
                 killRecordUI.SetKillRecord(killRecord);
                 killRecordUIs[index++] = killRecordUI;
             }
@@ -639,15 +648,9 @@ namespace Debrief
         public static TextMeshProUGUI KillRecordTitleText;
         public static void AddKillRecordContainer(Transform transform)
         {
-            var containerGO = new GameObject("KillRecordContainer");
-            killRecordContainerRect = containerGO.AddComponent<RectTransform>();
-
-            // 设置父级为LeftContent容器
-            if (leftContentRect != null)
-                killRecordContainerRect.SetParent(leftContentRect, false);
-            else
-                killRecordContainerRect.SetParent(transform);
-
+            var containerGO = leftContentRect.GetOrAddGameObject("KillRecordContainer");
+            killRecordContainerRect = containerGO.GetOrAddComponent<RectTransform>();
+            
             killRecordContainerRect.anchorMin = new Vector2(0f, 1f); // 左下锚点：左侧(0)，顶部(1)
             killRecordContainerRect.anchorMax = new Vector2(1f, 1f); // 右上锚点：右侧(1)，顶部(1)
             killRecordContainerRect.pivot = new Vector2(0.5f, 1f); // 轴心点：顶部中心
@@ -655,7 +658,7 @@ namespace Debrief
             killRecordContainerRect.sizeDelta = new Vector2(0f, Screen.height/2f); // 宽度自适应，固定高度300
 
             // 添加垂直布局组
-            var verticalLayout = containerGO.AddComponent<VerticalLayoutGroup>();
+            var verticalLayout = containerGO.GetOrAddComponent<VerticalLayoutGroup>();
             verticalLayout.spacing = 5;
             verticalLayout.childControlWidth = true;
             verticalLayout.childControlHeight = true;
@@ -664,36 +667,35 @@ namespace Debrief
             verticalLayout.childAlignment = TextAnchor.UpperLeft;
 
             // 添加内容尺寸适配器
-            var contentFitter = containerGO.AddComponent<ContentSizeFitter>();
+            var contentFitter = containerGO.GetOrAddComponent<ContentSizeFitter>();
             contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 添加滚动视图
-            var scrollRect = containerGO.AddComponent<ScrollRect>();
+            var scrollRect = containerGO.GetOrAddComponent<ScrollRect>();
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
             scrollRect.viewport = killRecordContainerRect;
             scrollRect.content = killRecordContainerRect;
 
             // 添加遮罩
-            var mask = containerGO.AddComponent<Mask>();
+            var mask = containerGO.GetOrAddComponent<Mask>();
             mask.showMaskGraphic = false;
 
             // 添加背景
-            var background = containerGO.AddComponent<Image>();
+            var background = containerGO.GetOrAddComponent<Image>();
             background.color = new Color(0f, 0f, 0f, 0.5f); // 半透明黑色
 
             // 添加标题
-            var titleGO = new GameObject("Title");
-            var titleRect = titleGO.AddComponent<RectTransform>();
-            titleRect.SetParent(killRecordContainerRect, false);
+            var titleGO = killRecordContainerRect.GetOrAddGameObject("Title");
+            var titleRect = titleGO.GetOrAddComponent<RectTransform>();
             titleRect.sizeDelta = new Vector2(0f, 30f);
             titleRect.anchorMin = new Vector2(0f, 1f);
             titleRect.anchorMax = new Vector2(1f, 1f);
             titleRect.pivot = new Vector2(0.5f, 1f);
             titleRect.anchoredPosition = new Vector2(0f, -5f);
 
-            KillRecordTitleText = titleGO.AddComponent<TextMeshProUGUI>();
+            KillRecordTitleText = titleGO.GetOrAddComponent<TextMeshProUGUI>();
             KillRecordTitleText.text = "击杀记录";
             KillRecordTitleText.alignment = TextAlignmentOptions.Center;
             KillRecordTitleText.fontSize = SubTitleFontSize;
@@ -730,12 +732,11 @@ namespace Debrief
             var index = 0;
             foreach (var questRecord in records)
             {
-                var questRecordGO = new GameObject("QuestRecord");
-                var questRecordRect = questRecordGO.AddComponent<RectTransform>();
-                questRecordRect.SetParent(questRecordContainerRect, false);
+                var questRecordGO = questRecordContainerRect.GetOrAddGameObject($"QuestRecord{index}");
+                var questRecordRect = questRecordGO.GetOrAddComponent<RectTransform>();
                 questRecordRect.sizeDelta = new Vector2(480, 50); // 宽度略小于容器
 
-                var questRecordUI = questRecordGO.AddComponent<FinishedQuestUI>();
+                var questRecordUI = questRecordGO.GetOrAddComponent<FinishedQuestUI>();
                 questRecordUI.SetQuestData(questRecord);
                 questRecordUIs[index++] = questRecordUI;
             }
@@ -747,14 +748,8 @@ namespace Debrief
         public static TextMeshProUGUI QuestRecordTitleText;
         public static void AddQuestRecordContainer(Transform transform)
         {
-            var containerGO = new GameObject("QuestRecordContainer");
-            questRecordContainerRect = containerGO.AddComponent<RectTransform>();
-
-            // 设置父级为LeftContent容器
-            if (leftContentRect != null)
-                questRecordContainerRect.SetParent(leftContentRect, false);
-            else
-                questRecordContainerRect.SetParent(transform);
+            var containerGO = leftContentRect.GetOrAddGameObject("QuestRecordContainer");
+            questRecordContainerRect = containerGO.GetOrAddComponent<RectTransform>();
 
             questRecordContainerRect.anchorMin = new Vector2(0f, 0f); // 左下锚点：左侧(0)，底部(0)
             questRecordContainerRect.anchorMax = new Vector2(1f, 1f); // 右上锚点：右侧(1)，顶部(1)
@@ -763,7 +758,7 @@ namespace Debrief
             questRecordContainerRect.sizeDelta = new Vector2(0f, 0f); // 宽度和高度自适应
 
             // 添加垂直布局组
-            var verticalLayout = containerGO.AddComponent<VerticalLayoutGroup>();
+            var verticalLayout = containerGO.GetOrAddComponent<VerticalLayoutGroup>();
             verticalLayout.spacing = 5;
             verticalLayout.childControlWidth = true;
             verticalLayout.childControlHeight = true;
@@ -772,36 +767,36 @@ namespace Debrief
             verticalLayout.childAlignment = TextAnchor.UpperLeft;
 
             // 添加内容尺寸适配器
-            var contentFitter = containerGO.AddComponent<ContentSizeFitter>();
+            var contentFitter = containerGO.GetOrAddComponent<ContentSizeFitter>();
             contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             // 添加滚动视图
-            var scrollRect = containerGO.AddComponent<ScrollRect>();
+            var scrollRect = containerGO.GetOrAddComponent<ScrollRect>();
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
             scrollRect.viewport = questRecordContainerRect;
             scrollRect.content = questRecordContainerRect;
 
             // 添加遮罩
-            var mask = containerGO.AddComponent<Mask>();
+            var mask = containerGO.GetOrAddComponent<Mask>();
             mask.showMaskGraphic = false;
 
             // 添加背景
-            var background = containerGO.AddComponent<Image>();
+            var background = containerGO.GetOrAddComponent<Image>();
             background.color = new Color(0f, 0f, 0f, 0.5f); // 半透明黑色
 
             // 添加标题
-            var titleGO = new GameObject("Title");
-            var titleRect = titleGO.AddComponent<RectTransform>();
-            titleRect.SetParent(questRecordContainerRect, false);
+            var titleGO = questRecordContainerRect.GetOrAddGameObject("Title");
+            var titleRect = titleGO.GetOrAddComponent<RectTransform>();
+            
             titleRect.sizeDelta = new Vector2(0f, 30f);
             titleRect.anchorMin = new Vector2(0f, 1f);
             titleRect.anchorMax = new Vector2(1f, 1f);
             titleRect.pivot = new Vector2(0.5f, 1f);
             titleRect.anchoredPosition = new Vector2(0f, -5f);
 
-            QuestRecordTitleText = titleGO.AddComponent<TextMeshProUGUI>();
+            QuestRecordTitleText = titleGO.GetOrAddComponent<TextMeshProUGUI>();
             QuestRecordTitleText.text = "任务记录";
             QuestRecordTitleText.alignment = TextAlignmentOptions.Center;
             QuestRecordTitleText.fontSize = SubTitleFontSize;

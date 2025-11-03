@@ -326,6 +326,7 @@ namespace Debrief
         private void OnAfterSceneInitialize(SceneLoadingContext context)
         {
             ExtraCamera.CheckAndSetup();
+            ExtraCamera.Close();
             QuickStatsView.CreateView();
         }
 
@@ -333,11 +334,11 @@ namespace Debrief
         {
             ExtraCamera.Update();
             
-            // 检测O键按下
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                QuickStatsView.Instance.ToggleView();
-            }
+            // // 检测O键按下
+            // if (Input.GetKeyDown(KeyCode.O))
+            // {
+            //     QuickStatsView.Instance.ToggleView();
+            // }
         }
 
         private void OnStartedLoadingScene(SceneLoadingContext context)

@@ -44,6 +44,11 @@ namespace Debrief
         
         public static void Prefix(ClosureView __instance)
         {
+            CreateView(__instance);
+        }
+
+        public static void CreateView(ClosureView __instance)
+        {
             QuickStatsView.AddExtraCharacterRenderer(__instance.transform);
             
             AddDurationTextComponent(__instance);

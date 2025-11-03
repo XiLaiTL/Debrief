@@ -24,31 +24,51 @@ namespace Debrief
         {
             _cameraRendering = false;
         }
+
+        // 不起作用
+        public void Open()
+        {
+            if (_mainCharacterCamera)
+            {
+                _mainCharacterCamera.enabled = true;
+                _mainCharacterCamera.gameObject.SetActive(true);
+            }
+        }
+
+        // 不起作用
+        public void Close()
+        {
+            if (_mainCharacterCamera)
+            {
+                _mainCharacterCamera.enabled = false;
+                _mainCharacterCamera.gameObject.SetActive(false);
+            }
+        }
         
         private void Setup()
         {
-            // 创建特写相机
-            var cameraGO = new GameObject("CharacterCloseUpCamera");
-            _mainCharacterCamera = cameraGO.AddComponent<Camera>();
-    
-            // 设置相机属性 - 保持透视用于特写
-            _mainCharacterCamera.orthographic = false;
-            _mainCharacterCamera.fieldOfView = 25f; // 较小的FOV减少畸变，更适合特写
-            _mainCharacterCamera.nearClipPlane = 0.01f; // 重要：避免裁剪太近的物体
-            _mainCharacterCamera.farClipPlane = 5f;
-            _mainCharacterCamera.clearFlags = CameraClearFlags.SolidColor;
-            ColorUtility.TryParseHtmlString("#0D0D0DFF", out var background);
-            _mainCharacterCamera.backgroundColor = Color.clear; //background; 
-
-            // 创建Render Texture
-            _mainCharacterCamera.targetTexture = CharacterTexture;
-    
             // 找到玩家
             var playerTransform = LevelManager.Instance.MainCharacter.characterModel.transform;
             if (playerTransform != null)
             {
                 Debug.Log($"Player found: {playerTransform.name}");
         
+                // 创建特写相机
+                var cameraGO = playerTransform.GetOrAddGameObject("CharacterCloseUpCamera");
+                _mainCharacterCamera = cameraGO.GetOrAddComponent<Camera>();
+    
+                // 设置相机属性 - 保持透视用于特写
+                _mainCharacterCamera.orthographic = false;
+                _mainCharacterCamera.fieldOfView = 25f; // 较小的FOV减少畸变，更适合特写
+                _mainCharacterCamera.nearClipPlane = 0.01f; // 重要：避免裁剪太近的物体
+                _mainCharacterCamera.farClipPlane = 5f;
+                _mainCharacterCamera.clearFlags = CameraClearFlags.SolidColor;
+                ColorUtility.TryParseHtmlString("#0D0D0DFF", out var background);
+                _mainCharacterCamera.backgroundColor = Color.clear; //background; 
+
+                // 创建Render Texture
+                _mainCharacterCamera.targetTexture = CharacterTexture;
+                
                 // 设置相机跟随玩家
                 cameraGO.transform.parent = playerTransform;
         
