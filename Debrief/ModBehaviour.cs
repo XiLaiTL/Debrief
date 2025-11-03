@@ -17,7 +17,8 @@ namespace Debrief
 {
     public class ModBehaviour : Duckov.Modding.ModBehaviour
     {
-        private const string Id = "XiLaiTL.Debrief";
+        public const string ModName = "Debrief";
+        private const string Id = "XiLaiTL." + ModName;
 
         /// <summary>
         /// 进入关卡时玩家身上的总价值
@@ -121,6 +122,22 @@ namespace Debrief
                     }
                 }
             }
+            var characterSlot = LevelManager.Instance?.MainCharacter?.CharacterItem?.Slots;
+            if (characterSlot != null)
+            {
+                foreach (var slot in characterSlot)
+                {
+                    if (slot != null)
+                    {
+                        var item = slot.Content;
+                        if (item != null)
+                        {
+                            allBelongsToPlayer.Add(item);
+                        }
+                    }
+                }
+            }
+            
             var petProxyInventory = LevelManager.Instance?.PetProxy?.Inventory;
             if (petProxyInventory != null)
             {
@@ -144,6 +161,21 @@ namespace Debrief
                         if (item2 != null)
                         {
                             allItems.Add(item2);
+                        }
+                    }
+                }
+                var slots = item.Slots;
+                if (slots != null)
+                {
+                    foreach (var slot in slots)
+                    {
+                        if (slot != null)
+                        {
+                            var item2 = slot.Content;
+                            if (item2 != null)
+                            {
+                                allItems.Add(item2);
+                            }
                         }
                     }
                 }
@@ -294,15 +326,22 @@ namespace Debrief
         private void OnAfterSceneInitialize(SceneLoadingContext context)
         {
             ExtraCamera.CheckAndSetup();
+            QuickStatsView.CreateView();
         }
 
         private void Update()
         {
             ExtraCamera.Update();
+            
+            // 检测O键按下
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                QuickStatsView.Instance.ToggleView();
+            }
         }
+
         private void OnStartedLoadingScene(SceneLoadingContext context)
         {
-            
             if (CurrentSceneName == "Base")
             {
                 // 如果之前在基地，说明要进入关卡了，记录进入关卡时玩家身上的总价值和时间
@@ -327,17 +366,15 @@ namespace Debrief
             Debug.Log("Debrief Mod OnEnable");
 
             ItemValueUtils.Setup();
+            SpriteUtils.Setup();
             
             SceneLoader.onStartedLoadingScene += OnStartedLoadingScene;
             SceneLoader.onAfterSceneInitialize += OnAfterSceneInitialize;
             Health.OnDead += OnDead;
             
-            
             harmony = new Harmony(Id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
-
-        
 
         private void OnDisable()
         {

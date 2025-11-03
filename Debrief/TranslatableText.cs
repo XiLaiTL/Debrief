@@ -19,16 +19,16 @@ namespace Debrief
                 {
                     LanguageKey.TotalReward, new Dictionary<SystemLanguage, string>
                     {
-                        { SystemLanguage.ChineseSimplified, "本局收益：{0:n0}" },
-                        { SystemLanguage.ChineseTraditional, "本局收益：{0:n0}" },
-                        { SystemLanguage.Japanese, "今回の獲得：{0:n0}" },
-                        { SystemLanguage.German, "Gesamtertrag: {0:n0}" },
-                        { SystemLanguage.Russian, "Общий результат: {0:n0}" },
-                        { SystemLanguage.Spanish, "Total de la partida: {0:n0}" },
-                        { SystemLanguage.Korean, "이번 경기 수익: {0:n0}" },
-                        { SystemLanguage.French, "Gain total: {0:n0}" },
-                        { SystemLanguage.Portuguese, "Total da partida: {0:n0}" },
-                        { SystemLanguage.English, "Match Total: {0:n0}" }
+                        { SystemLanguage.ChineseSimplified, "本局收益：" },
+                        { SystemLanguage.ChineseTraditional, "本局收益：" },
+                        { SystemLanguage.Japanese, "今回の獲得：" },
+                        { SystemLanguage.German, "Gesamtertrag: " },
+                        { SystemLanguage.Russian, "Общий результат: " },
+                        { SystemLanguage.Spanish, "Total de la partida:" },
+                        { SystemLanguage.Korean, "이번 경기 수익: " },
+                        { SystemLanguage.French, "Gain total: " },
+                        { SystemLanguage.Portuguese, "Total da partida: " },
+                        { SystemLanguage.English, "Match Total: " }
                     }
                 },
                 {

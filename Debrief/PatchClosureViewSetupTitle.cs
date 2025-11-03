@@ -15,17 +15,17 @@ namespace Debrief
         {
 
             var totalValue = (int)(ModBehaviour.PlayerTotalValue() - ModBehaviour.EnterLevelTotalValue);
-            PatchClosureViewAwake.SetTotalRewardText(totalValue);
+            QuickStatsView.SetTotalRewardText(totalValue);
             
             var duration = GameClock.Now - ModBehaviour.EnterLevelTime;
-            PatchClosureViewAwake.SetDurationText(duration);
+            QuickStatsView.SetDurationText(duration);
 
             var mostValueItems = ModBehaviour.MostValueItems();
-            PatchClosureViewAwake.SetItemStack(mostValueItems);
+            QuickStatsView.SetItemStack(mostValueItems);
             
-            PatchClosureViewAwake.UpdateKillRecords(ModBehaviour.KillRecords);
+            QuickStatsView.UpdateKillRecords(ModBehaviour.KillRecords);
             
-            PatchClosureViewAwake.UpdateQuestRecords(ModBehaviour.GetFinishedQuests());
+            QuickStatsView.UpdateQuestRecords(ModBehaviour.GetFinishedQuests());
         }
     }
 }

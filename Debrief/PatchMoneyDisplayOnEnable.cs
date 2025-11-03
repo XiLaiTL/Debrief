@@ -97,7 +97,7 @@ namespace Debrief
                     totalValue = (int)(ModBehaviour.PlayerTotalValue() - ModBehaviour.EnterLevelTotalValue);
                 }
 
-                totalRewardText.text = TranslatableText.T(LanguageKey.TotalReward, totalValue);
+                totalRewardText.text = TranslatableText.T(LanguageKey.TotalReward) + $"{totalValue:n0}";
             }
 
             Action<Item> onSetStackCount = item => {

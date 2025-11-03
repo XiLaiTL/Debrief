@@ -15,9 +15,12 @@ namespace Debrief
         private TextMeshProUGUI totalValueText;
 
         // 配置常量
-        private const float BACKGROUND_SIZE = 100f;
-        private const float ICON_SCALE = 0.8f;
-        private const float CORNER_RADIUS = 10f;
+        private const float BackgroundSize = 90;
+        private const float IconScale = 0.8f;
+        
+        private const int StackCountFontSize = 16;
+        private const int NameFontSize = 14;
+        private const int TotalValueFontSize = 16;
 
         // 缓存字体避免重复加载
         private static Font _arialFont;
@@ -51,7 +54,7 @@ namespace Debrief
             
             // 设置RectTransform
             var rt = background.rectTransform;
-            rt.sizeDelta = new Vector2(BACKGROUND_SIZE, BACKGROUND_SIZE);
+            rt.sizeDelta = new Vector2(BackgroundSize, BackgroundSize);
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
@@ -69,47 +72,47 @@ namespace Debrief
             iconImage.preserveAspect = true;
             
             var rt = iconImage.rectTransform;
-            rt.sizeDelta = new Vector2(BACKGROUND_SIZE * ICON_SCALE, BACKGROUND_SIZE * ICON_SCALE);
+            rt.sizeDelta = new Vector2(BackgroundSize * IconScale, BackgroundSize * IconScale);
             rt.localPosition = Vector3.zero;
         }
 
         private void CreateStackCountText()
         {
             stackCountText = CreateTextComponent("StackCount", 
-                new Vector2(-5f, 5f), 
-                12, 
+                new Vector2(0f, NameFontSize), 
+                StackCountFontSize, 
                 Color.white);
             
             var rt = stackCountText.rectTransform;
             rt.sizeDelta = new Vector2(30f, 20f);
-            rt.anchorMin = new Vector2(1f, 0f);
-            rt.anchorMax = new Vector2(1f, 0f);
+            rt.anchorMin = new Vector2(1f, 1-IconScale);
+            rt.anchorMax = new Vector2(1f, 1-IconScale);
             rt.pivot = new Vector2(1f, 0f);
         }
 
         private void CreateNameText()
         {
             nameText = CreateTextComponent("Name",
-                new Vector2(0f, -15f),
-                10,
+                new Vector2(0f, NameFontSize),
+                NameFontSize,
                 Color.white);
-            
+            nameText.alignment = TextAlignmentOptions.Center;
             var rt = nameText.rectTransform;
-            rt.sizeDelta = new Vector2(BACKGROUND_SIZE - 10f, 20f);
-            rt.anchorMin = new Vector2(0.5f, 0f);
-            rt.anchorMax = new Vector2(0.5f, 0f);
+            rt.sizeDelta = new Vector2(BackgroundSize - 10f, 20f);
+            rt.anchorMin = new Vector2(0.5f, 1-IconScale);
+            rt.anchorMax = new Vector2(0.5f, 1-IconScale);
             rt.pivot = new Vector2(0.5f, 1f);
         }
 
         private void CreateTotalValueText()
         {
             totalValueText = CreateTextComponent("TotalValue",
-                new Vector2(0f, 15f),
-                12,
+                new Vector2(0f, - TotalValueFontSize),
+                TotalValueFontSize,
                 Color.yellow);
-            
+            totalValueText.alignment = TextAlignmentOptions.Center;
             var rt = totalValueText.rectTransform;
-            rt.sizeDelta = new Vector2(BACKGROUND_SIZE - 10f, 20f);
+            rt.sizeDelta = new Vector2(BackgroundSize - 10f, 20f);
             rt.anchorMin = new Vector2(0.5f, 1f);
             rt.anchorMax = new Vector2(0.5f, 1f);
             rt.pivot = new Vector2(0.5f, 0f);
@@ -144,8 +147,15 @@ namespace Debrief
         private void ApplyItemStackData(ItemStack itemStack)
         {
             // 设置背景颜色
-            background.color = ItemValueUtils.GetItemValueLevelColor(itemStack.ItemValueLevel);
-            
+            if (itemStack.ItemValueLevel == ItemValueLevel.White)
+            {
+                background.sprite = SpriteUtils.BgVoid;
+            }
+            else
+            {
+                background.color = ItemValueUtils.GetItemValueLevelColor(itemStack.ItemValueLevel);
+                background.sprite = SpriteUtils.BgWhite;
+            }
 
             // 设置图标
             if (itemStack.Icon != null)
@@ -178,8 +188,8 @@ namespace Debrief
                 return "Unknown Item";
             
             // 名称长度限制
-            return itemStack.DisplayName.Length > 15 
-                ? itemStack.DisplayName.Substring(0, 12) + "..." 
+            return itemStack.DisplayName.Length > 8 
+                ? itemStack.DisplayName[..6] + "..." 
                 : itemStack.DisplayName;
         }
 

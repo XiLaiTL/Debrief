@@ -7,15 +7,15 @@ namespace Debrief
 {
     public class KillRecordUI : MonoBehaviour
     {
-        private Image background;
         private Image weaponIconImage;
         private Image victimIconImage;
         private TextMeshProUGUI victimNameText;
         private TextMeshProUGUI killCountText;
         private HorizontalLayoutGroup layoutGroup;
 
-        // 圆角半径常量
-        private const float CORNER_RADIUS = 10f;
+        // 常量
+        private const int FontSize = 24;
+
 
         private void Awake()
         {
@@ -31,36 +31,18 @@ namespace Debrief
             transform.localScale = Vector3.one;
             transform.localPosition = Vector3.zero;
             
-            // 创建圆角背景
-            CreateBackground();
-            
             // 创建水平布局组
             CreateLayoutGroup();
             
             // 创建各个UI元素
+            CreatePlaceHolder();
             CreateWeaponIcon();
             CreateVictimIcon();
             CreateVictimNameText();
             CreateKillCountText();
         }
 
-        private void CreateBackground()
-        {
-            var backgroundGO = new GameObject("Background");
-            backgroundGO.transform.SetParent(transform, false);
-            background = backgroundGO.AddComponent<Image>();
-            
-            // 设置RectTransform
-            var rt = background.rectTransform;
-            rt.anchorMin = new Vector2(0, 0);
-            rt.anchorMax = new Vector2(1, 1);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.localPosition = Vector3.zero;
-            rt.sizeDelta = Vector2.zero;
-            
-            // 设置默认背景色
-            background.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-        }
+
 
         private void CreateLayoutGroup()
         {
@@ -76,6 +58,22 @@ namespace Debrief
             ContentSizeFitter sizeFitter = gameObject.AddComponent<ContentSizeFitter>();
             sizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        }
+
+        private void CreatePlaceHolder()
+        {
+            GameObject placeHolderObj = new GameObject("PlaceHolder");
+            placeHolderObj.transform.SetParent(transform, false);
+            Image placeHolderImage = placeHolderObj.AddComponent<Image>();
+            placeHolderImage.color = Color.clear;
+            placeHolderImage.preserveAspect = false;
+            
+            // 添加 LayoutElement
+            var layoutElement = placeHolderObj.AddComponent<LayoutElement>();
+            layoutElement.preferredWidth = 40;
+            layoutElement.preferredHeight = 40;
+            layoutElement.minWidth = 40;
+            layoutElement.minHeight = 40;
         }
 
         private void CreateWeaponIcon()
@@ -102,25 +100,25 @@ namespace Debrief
     
             // 添加 LayoutElement
             var layoutElement = victimIconObj.AddComponent<LayoutElement>();
-            layoutElement.preferredWidth = 40;
-            layoutElement.preferredHeight = 40;
-            layoutElement.minWidth = 40;
-            layoutElement.minHeight = 40;
+            layoutElement.preferredWidth = 28;
+            layoutElement.preferredHeight = 28;
+            layoutElement.minWidth = 28;
+            layoutElement.minHeight = 28;
     
             victimIconImage.preserveAspect = true;
         }
 
         private void CreateVictimNameText()
         {
-            victimNameText = CreateTextComponent("VictimName", new Vector2(0, 0), 14, Color.white);
-            victimNameText.rectTransform.sizeDelta = new Vector2(120, 20);
+            victimNameText = CreateTextComponent("VictimName", new Vector2(0, 0), FontSize, Color.white);
+            victimNameText.rectTransform.sizeDelta = new Vector2(120, 24);
             victimNameText.alignment = TextAlignmentOptions.MidlineLeft;
         }
 
         private void CreateKillCountText()
         {
-            killCountText = CreateTextComponent("KillCount", new Vector2(0, 0), 14, Color.yellow);
-            killCountText.rectTransform.sizeDelta = new Vector2(40, 20);
+            killCountText = CreateTextComponent("KillCount", new Vector2(0, 0), FontSize, Color.yellow);
+            killCountText.rectTransform.sizeDelta = new Vector2(40, 24);
             killCountText.alignment = TextAlignmentOptions.MidlineLeft;
         }
 
@@ -144,25 +142,11 @@ namespace Debrief
             {
                 victimIconImage.sprite = killRecord.VictimSprite;
                 victimIconImage.gameObject.SetActive(true);
-                
-                // 检查是否为Boss角色图标，如果是则设置背景为淡红色
-                if (killRecord.VictimSprite == GameplayDataSettings.UIStyle.BossCharacterIcon)
-                {
-                    background.color = new Color(1f, 0.7f, 0.7f, 0.9f); // 淡红色
-                }
-                else
-                {
-                    background.color = new Color(0.2f, 0.2f, 0.2f, 0.8f); // 默认背景色
-                }
-                
             }
             else
             {
                 victimIconImage.gameObject.SetActive(false);
-                background.color = new Color(0.2f, 0.2f, 0.2f, 0.8f); // 默认背景色
             }
-            background.color = new Color(1f, 0.7f, 0.7f, 0.9f); // 淡红色
-
             // 设置受害者名字
             victimNameText.text = GetDisplayName(killRecord.Victim);
 
@@ -170,6 +154,8 @@ namespace Debrief
             if (killRecord.KillCount > 1)
             {
                 killCountText.text = "X " + killRecord.KillCount;
+                // 根据击杀数设置文本颜色
+                killCountText.color = ItemValueUtils.GetKillCountColor(killRecord.KillCount);
                 killCountText.gameObject.SetActive(true);
             }
             else

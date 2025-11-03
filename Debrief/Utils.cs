@@ -1,4 +1,6 @@
-﻿using Duckov.Utilities;
+﻿using System.IO;
+using System.Reflection;
+using Duckov.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -41,5 +43,13 @@ namespace Debrief
             
             return textComponent;
         }
+        
+        // 获取当前dll的所在目录 by (F_G_O)
+        public static string GetDllDirectory()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+        
+
     }
 }

@@ -16,7 +16,7 @@ namespace Debrief
 
         public int GetTotalValue()
         {
-            return Value * StackCount;
+            return Value * StackCount / 2;
         }
 
         public ItemStack(int typeID, int stackCount, Sprite icon, string displayName, int value,

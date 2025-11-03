@@ -216,5 +216,37 @@ namespace Debrief
                     return White;
             }
         }
+        
+        public static Color GetKillCountColor(int killCount)
+        {
+            if (killCount >= 30)
+            {
+                return Red;
+            }
+            else if (killCount >= 20)
+            {
+                return LightRed;
+            }
+            else if (killCount >= 15)
+            {
+                return Orange;
+            }
+            else if (killCount >= 10)
+            {
+                return Purple;
+            }
+            else if (killCount >= 5)
+            {
+                return Blue;
+            }
+            else if (killCount >= 3)
+            {
+                return Green;
+            }
+            else
+            {
+                return Color.white;
+            }
+        }
     }
 }
