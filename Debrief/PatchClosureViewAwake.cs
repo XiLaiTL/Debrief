@@ -47,6 +47,22 @@ namespace Debrief
             CreateView(__instance);
         }
 
+        // 兼容性：删掉DisplayTotalReward加的部分
+        public static void Postfix(ClosureView __instance)
+        {
+            var textObj = __instance.transform.Find("Content/TotalRewardText");
+            if (textObj != null)
+            {
+                Object.Destroy(textObj.gameObject);
+            }
+
+            var durationTextObj = __instance.transform.Find("Content/DurationText");
+            if (durationTextObj != null)
+            {
+                Object.Destroy(durationTextObj.gameObject);
+            }
+        }
+        
         public static void CreateView(ClosureView __instance)
         {
             QuickStatsView.AddExtraCharacterRenderer(__instance.transform);

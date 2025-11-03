@@ -307,7 +307,7 @@ namespace Debrief
 
         public static void AddDurationTextComponent(Transform transform)
         {
-            durationText = transform.GetOrInstantiate("DurationText", GameplayDataSettings.UIStyle.TemplateTextUGUI);
+            durationText = transform.GetOrInstantiate("DebriefDurationText", GameplayDataSettings.UIStyle.TemplateTextUGUI);
             durationText.enableAutoSizing = true;
             durationText.fontSizeMin = 25;
             durationText.fontSizeMax = 40;
