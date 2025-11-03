@@ -1,4 +1,4 @@
-# [Escape from Duckov Mod] Display Match Total & Duration
+# [Escape from Duckov Mod] Debrief
 
 [Chinese ReadMe](./README.md)
 
@@ -8,6 +8,8 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=3588652490
 ## Introduction
 
 In Duckov, you can enjoy a chubby extraction too! The backpack and results screens now show your actual profit (after deductions) and the duration of the match.
+
+Additionally, the mod displays the most valuable items obtained during the match, task completion progress, and the number of enemies killed.
 
 ## How to Use
 
