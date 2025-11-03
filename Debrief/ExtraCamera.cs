@@ -48,6 +48,10 @@ namespace Debrief
         private void Setup()
         {
             // 找到玩家
+            if (LevelManager.Instance == null || LevelManager.Instance.MainCharacter == null)
+            {
+                return;
+            }
             var playerTransform = LevelManager.Instance.MainCharacter.characterModel.transform;
             if (playerTransform != null)
             {

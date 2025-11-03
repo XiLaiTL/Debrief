@@ -54,6 +54,11 @@ namespace Debrief
         /// </summary>
         public static void CreateView()
         {
+            if (LevelManager.Instance == null)
+            {
+                return;
+            }
+
             if (Instance == null)
             {
                 var viewGO = LevelManager.Instance.transform.GetOrAddGameObject("QuickStatsView");

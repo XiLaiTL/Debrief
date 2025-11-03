@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Duckov.Economy;
 using Duckov.MiniMaps;
@@ -38,8 +39,8 @@ namespace Debrief
         
         public static Dictionary<string, KillRecord> KillRecords = new Dictionary<string, KillRecord>();
         
-        public static List<Task> EnterLevelFinishedTasks = new List<Task>();
-        public static List<Quest> EnterLevelFinishedQuests = new List<Quest>();
+        public static List<string> EnterLevelFinishedTasks = new List<string>();
+        public static List<int> EnterLevelFinishedQuests = new List<int>();
         
         private Harmony harmony;
         
@@ -265,14 +266,16 @@ namespace Debrief
             var curFinishedQuests = PlayerQuestsFinished();
             var curFinishedTasks = PlayerTasksFinished();
             var finishedQuests = new List<FinishedQuest>();
+
             foreach (var quest in curFinishedQuests)
             {
-                if (!EnterLevelFinishedQuests.Contains(quest))
+                if (!EnterLevelFinishedQuests.Contains(quest.ID))
                 {
                     var finishedTasks = new List<string>();
                     foreach (var task in quest.Tasks )
                     {
-                        if (curFinishedTasks.Contains(task) && !EnterLevelFinishedTasks.Contains(task))
+                        var taskIDString = GetTaskIdString(task);
+                        if (curFinishedTasks.Contains(task) && !EnterLevelFinishedTasks.Contains(taskIDString))
                         {
                             finishedTasks.Add(task.Description);
                         }
@@ -325,9 +328,12 @@ namespace Debrief
         
         private void OnAfterSceneInitialize(SceneLoadingContext context)
         {
-            ExtraCamera.CheckAndSetup();
-            ExtraCamera.Close();
-            QuickStatsView.CreateView();
+            if (context.sceneName != "MainMenu")
+            {
+                ExtraCamera.CheckAndSetup();
+                ExtraCamera.Close();
+            }
+            // QuickStatsView.CreateView();
         }
 
         private void Update()
@@ -350,8 +356,9 @@ namespace Debrief
                 EnterLevelTime = GameClock.Now;
                 var totalItems = PlayerTotalItems();
                 EnterLevelItemCountMap = ItemCountMap(totalItems);
-                EnterLevelFinishedTasks = PlayerTasksFinished();
-                EnterLevelFinishedQuests = PlayerQuestsFinished();
+                EnterLevelFinishedTasks = PlayerTasksFinished().Select(GetTaskIdString).ToList();
+                EnterLevelFinishedQuests = PlayerQuestsFinished().Select(q => q.ID).ToList();
+
                 KillRecords.Clear();
             }
             CurrentSceneName = context.sceneName;
@@ -359,6 +366,18 @@ namespace Debrief
             {
                 // 如果进入基地，说明要退出关卡
                 ExtraCamera.Stop();
+            }
+        }
+        
+        private static string GetTaskIdString(Task  task)
+        {
+            if (task.Master != null)
+            {
+                return "" + task.Master.ID + "/" + task.ID;
+            }
+            else
+            {
+                return "/" + task.ID;
             }
         }
 
