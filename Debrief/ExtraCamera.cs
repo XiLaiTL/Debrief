@@ -1,13 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Debrief
 {
     public class ExtraCamera
     {
         
-        private Camera _mainCharacterCamera;
+        private Camera? _mainCharacterCamera;
         
-        public RenderTexture CharacterTexture = new RenderTexture(1024, 1024, 24);
+        public RenderTexture? CharacterTexture;
         
         
         /// <summary>
@@ -44,9 +46,41 @@ namespace Debrief
                 _mainCharacterCamera.gameObject.SetActive(false);
             }
         }
+
+        /// <summary>
+        /// 完全销毁相机并清理资源
+        /// </summary>
+        public void Destroy()
+        {
+            // 停止渲染
+            _cameraRendering = false;
+            
+            // 销毁相机GameObject
+            if (_mainCharacterCamera != null)
+            {
+                if (_mainCharacterCamera.gameObject != null)
+                {
+                    Object.Destroy(_mainCharacterCamera.gameObject);
+                }
+                _mainCharacterCamera = null;
+            }
+            
+            // 清理RenderTexture
+            if (CharacterTexture != null)
+            {
+                CharacterTexture.Release();
+                CharacterTexture = null;
+            }
+            
+            Debug.Log("[ExtraCamera] Camera destroyed and resources cleaned up.");
+        }
         
         private void Setup()
         {
+            if (CharacterTexture == null)
+            {
+                CharacterTexture = new RenderTexture(1024, 1024, 24);
+            }
             // 找到玩家
             if (LevelManager.Instance == null || LevelManager.Instance.MainCharacter == null)
             {
@@ -97,9 +131,9 @@ namespace Debrief
 
         public void Update()
         {
-            if (_mainCharacterCamera)
+            if (_cameraRendering)
             {
-                if (_cameraRendering)
+                if (_mainCharacterCamera)
                 {
                     _mainCharacterCamera.Render();
                 }

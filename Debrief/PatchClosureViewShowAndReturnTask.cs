@@ -22,6 +22,7 @@ namespace Debrief
             Debug.Log($"[Debrief] ShowAndReturnTask called with duration: {duration}");
             
             ModBehaviour.ExtraCamera.Open();
+            ModBehaviour.ExtraCamera.Start();
             return true;
         }
 
@@ -35,6 +36,7 @@ namespace Debrief
             Debug.Log($"[Debrief] ShowAndReturnTask called with DamageInfo and duration: {duration}");
             
             ModBehaviour.ExtraCamera.Open();
+            ModBehaviour.ExtraCamera.Start();
             return true;
         }
     }

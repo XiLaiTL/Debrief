@@ -277,7 +277,7 @@ namespace Debrief
         public static void AddExtraCharacterRenderer(Transform transform)
         {
             // 开启相机渲染
-            ModBehaviour.ExtraCamera.Start();
+            // ModBehaviour.ExtraCamera.Start();
 
             var containerGO = transform.GetOrAddGameObject("ExtraCharacterRenderer");
             var container = containerGO.GetOrAddComponent<RectTransform>();
